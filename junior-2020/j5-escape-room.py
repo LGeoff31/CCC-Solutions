@@ -1,40 +1,32 @@
-import collections
 import sys
-rows = int(sys.stdin.readline())
-cols = int(sys.stdin.readline())
-board = []
+from collections import deque  
+input = sys.stdin.readline
+queue = deque()
+big_num = int(1e6+5)
+visited = [False for i in range(big_num)]
+lst = [[] for i in range(big_num)]
+qualified = False
+n = int(input())
+m = int(input())
 
-for i in range(rows):
-    a = [int(x) for x in sys.stdin.readline().split()]
-    board.append(a)
-queue = collections.deque([(1,1)])
-searched = collections.deque([(1,1)])
+for i in range(1,n+1):
+    input_lst = [int(x) for x in input().split()]
+    for j in range(1,len(input_lst)+1):
+        lst[(i)*(j)].append(input_lst[j-1])
+        if i == j == 1:
+            visited[input_lst[j-1]] = True
+            queue.append(input_lst[j-1])
 
-def get_next(loc):
-    lst = []
-    x,y = loc
-    num = board[x-1][y-1]
-    for i in range(1,num+1):
-        if num%i==0: #Check factors
-            if i<=rows and num//i <= cols: #Check within board
-                lst.append([i, num//i])
-    return lst
+while queue:
+    num = queue.popleft()
+    if num == m * n:
+        qualified = True
+    else:
+        for nxt_char in lst[num]:
+            if visited[nxt_char] == False:
+                visited[nxt_char] = True
+                queue.append(nxt_char)
 
-steps = 0
-p = 1
-while len(queue) > 0:
-    if [rows, cols] in queue:
-        p=0
-        break
+if qualified: print("yes")
+else: print("no")
 
-    for i in range(len(queue)):
-        loc = queue.popleft()
-        for new_loc in get_next(loc):
-            if new_loc not in searched:
-                queue.append(new_loc)
-                searched.append(new_loc)
-
-if p==0: 
-    print("yes")
-else: 
-    print("no")
